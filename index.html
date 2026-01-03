@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gourmet Note Geo v14</title>
+    <title>Gourmet Note Geo v15</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -18,7 +18,7 @@
     <style>
         .day-checkbox:checked + label { background-color: #f97316; color: white; border-color: #f97316; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        input[type="time"] { min-height: 44px; } /* タップ領域の確保 */
+        input[type="time"] { min-height: 44px; }
     </style>
 </head>
 <body class="bg-brand-50 text-slate-700 font-sans pb-24">
@@ -36,11 +36,11 @@
         <div class="mb-4 space-y-3">
             <div class="relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                <input type="text" id="searchInput" oninput="renderList()" placeholder="店名、ジャンル、メモで検索..." 
+                <input type="text" id="searchInput" oninput="renderList()" placeholder="店名、ジャンル、タグ、メモで検索..." 
                     class="w-full pl-11 pr-4 py-3 border-2 border-brand-100 rounded-2xl focus:ring-2 focus:ring-brand-500 bg-white shadow-sm outline-none transition-all">
             </div>
             
-            <div id="genreTags" class="flex gap-2 overflow-x-auto no-scrollbar pb-1 pt-1"></div>
+            <div id="allTagsContainer" class="flex gap-2 overflow-x-auto no-scrollbar pb-1 pt-1"></div>
 
             <div class="flex gap-2 text-[11px]">
                 <button id="filterNowBtn" onclick="toggleFilter('now')" class="flex-1 py-2.5 rounded-xl font-bold border transition bg-white border-gray-200 text-gray-500 flex items-center justify-center gap-1.5 shadow-sm">🕒 営業中</button>
@@ -75,19 +75,6 @@
                     </div>
                 </div>
 
-                <div>
-                    <label class="block font-bold text-gray-500 mb-2">営業曜日</label>
-                    <div class="flex justify-between gap-1">
-                        <input type="checkbox" id="d0" class="day-checkbox hidden" checked><label for="d0" class="flex-1 text-center py-2.5 border-2 border-gray-100 rounded-xl text-[11px] font-bold cursor-pointer">日</label>
-                        <input type="checkbox" id="d1" class="day-checkbox hidden" checked><label for="d1" class="flex-1 text-center py-2.5 border-2 border-gray-100 rounded-xl text-[11px] font-bold cursor-pointer">月</label>
-                        <input type="checkbox" id="d2" class="day-checkbox hidden" checked><label for="d2" class="flex-1 text-center py-2.5 border-2 border-gray-100 rounded-xl text-[11px] font-bold cursor-pointer">火</label>
-                        <input type="checkbox" id="d3" class="day-checkbox hidden" checked><label for="d3" class="flex-1 text-center py-2.5 border-2 border-gray-100 rounded-xl text-[11px] font-bold cursor-pointer">水</label>
-                        <input type="checkbox" id="d4" class="day-checkbox hidden" checked><label for="d4" class="flex-1 text-center py-2.5 border-2 border-gray-100 rounded-xl text-[11px] font-bold cursor-pointer">木</label>
-                        <input type="checkbox" id="d5" class="day-checkbox hidden" checked><label for="d5" class="flex-1 text-center py-2.5 border-2 border-gray-100 rounded-xl text-[11px] font-bold cursor-pointer">金</label>
-                        <input type="checkbox" id="d6" class="day-checkbox hidden" checked><label for="d6" class="flex-1 text-center py-2.5 border-2 border-gray-100 rounded-xl text-[11px] font-bold cursor-pointer">土</label>
-                    </div>
-                </div>
-
                 <div class="bg-brand-50 p-4 rounded-[1.5rem] border border-brand-100 space-y-3">
                     <div class="grid grid-cols-2 gap-4">
                         <div class="flex flex-col gap-1">
@@ -112,23 +99,24 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
-                    <div><label class="block font-bold text-gray-500 mb-1.5">ジャンル</label><input type="text" id="shopGenre" list="genreList" class="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:border-brand-500 outline-none"></div>
+                    <div><label class="block font-bold text-gray-500 mb-1.5">ジャンル</label><input type="text" id="shopGenre" list="genreList" placeholder="和食など" class="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:border-brand-500 outline-none"></div>
                     <div>
                         <label class="block font-bold text-gray-500 mb-1.5">評価</label>
                         <select id="shopRating" class="w-full px-4 py-3 border-2 border-gray-100 rounded-xl bg-white text-yellow-500 font-bold outline-none">
-                            <option value="5">★★★★★</option>
-                            <option value="4">★★★★☆</option>
-                            <option value="3" selected>★★★☆☆</option>
-                            <option value="2">★★☆☆☆</option>
-                            <option value="1">★☆☆☆☆</option>
+                            <option value="5">★★★★★</option><option value="4">★★★★☆</option><option value="3" selected>★★★☆☆</option><option value="2">★★☆☆☆</option><option value="1">★☆☆☆☆</option>
                         </select>
                     </div>
                 </div>
                 <datalist id="genreList"></datalist>
 
                 <div>
+                    <label class="block font-bold text-gray-500 mb-1.5">タグ（カンマ・スペース区切り）</label>
+                    <input type="text" id="shopTags" placeholder="一人飯, ベビーカーOK, コスパ" class="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:border-brand-500 outline-none">
+                </div>
+
+                <div>
                     <label class="block font-bold text-gray-500 mb-1.5">メモ</label>
-                    <textarea id="shopMemo" rows="2" placeholder="オムライスが絶品！など" class="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:border-brand-500 outline-none"></textarea>
+                    <textarea id="shopMemo" rows="2" placeholder="おすすめメニュー、雰囲気など" class="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:border-brand-500 outline-none"></textarea>
                 </div>
 
                 <div><label class="block font-bold text-gray-500 mb-1.5">関連URL</label><input type="url" id="shopUrl" oninput="extractCoords(this.value)" class="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:border-brand-500 outline-none"></div>
@@ -139,17 +127,17 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'myGourmetApp_v14';
-        let filters = { now: false, near: false, genre: null }, userPos = null;
+        const STORAGE_KEY = 'myGourmetApp_v15';
+        let filters = { now: false, near: false, activeTag: null }, userPos = null;
 
         function getShops() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
 
         function handleSecondHoursFocus() {
-            const o2 = document.getElementById('open2'), c2 = document.getElementById('close2'), c1 = document.getElementById('close1').value;
+            const o2 = document.getElementById('open2'), c1 = document.getElementById('close1').value;
             if (o2.value || !c1) return;
             const [h, m] = c1.split(':').map(Number);
             o2.value = `${String((h+1)%24).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-            c2.value = `${String((h+6)%24).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+            document.getElementById('close2').value = `${String((h+6)%24).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
         }
 
         async function searchCoordsByAddress() {
@@ -186,11 +174,11 @@
                 const o = Number(r.open.replace(':','')), c = Number(r.close.replace(':',''));
                 return (o < c) ? (isToday && currentTime >= o && currentTime <= c) : (isToday ? currentTime >= o : currentTime <= c);
             };
-            return (shop.openDays.includes(day) && shop.times.some(t => check(t, true))) || (shop.openDays.includes(yesterday) && shop.times.some(t => check(t, false)));
+            return (shop.openDays?.includes(day) && shop.times.some(t => check(t, true))) || (shop.openDays?.includes(yesterday) && shop.times.some(t => check(t, false)));
         }
 
-        function toggleGenre(genre) {
-            filters.genre = (filters.genre === genre) ? null : genre;
+        function toggleTag(tag) {
+            filters.activeTag = (filters.activeTag === tag) ? null : tag;
             renderList();
         }
 
@@ -212,17 +200,34 @@
         function renderList() {
             let shops = getShops();
             const query = document.getElementById('searchInput').value.toLowerCase();
-            if (query) shops = shops.filter(s => s.name.toLowerCase().includes(query) || s.genre.toLowerCase().includes(query) || (s.address && s.address.toLowerCase().includes(query)) || (s.memo && s.memo.toLowerCase().includes(query)));
-            if (filters.genre) shops = shops.filter(s => s.genre === filters.genre);
+            
+            // フィルタリング
+            if (query) {
+                shops = shops.filter(s => 
+                    s.name.toLowerCase().includes(query) || 
+                    s.genre.toLowerCase().includes(query) || 
+                    (s.address && s.address.toLowerCase().includes(query)) || 
+                    (s.memo && s.memo.toLowerCase().includes(query)) ||
+                    (s.tags && s.tags.some(t => t.toLowerCase().includes(query)))
+                );
+            }
+            if (filters.activeTag) {
+                shops = shops.filter(s => s.genre === filters.activeTag || (s.tags && s.tags.includes(filters.activeTag)));
+            }
             if (filters.now) shops = shops.filter(s => isOpening(s));
             if (filters.near && userPos) shops.sort((a, b) => getDistance(userPos.lat, userPos.lng, a.lat, a.lng) - getDistance(userPos.lat, userPos.lng, b.lat, b.lng));
 
-            const genres = [...new Set(getShops().map(s => s.genre))];
-            const tagContainer = document.getElementById('genreTags');
-            tagContainer.innerHTML = genres.map(g => `
-                <button onclick="toggleGenre('${g}')" class="px-4 py-1.5 rounded-full text-[11px] font-bold border-2 transition-all whitespace-nowrap shadow-sm
-                ${filters.genre === g ? 'bg-brand-500 border-brand-500 text-white' : 'bg-white border-brand-100 text-brand-600'}">
-                    ${g}
+            // 全タグの集計
+            const allTags = new Set();
+            getShops().forEach(s => {
+                if (s.genre) allTags.add(s.genre);
+                if (s.tags) s.tags.forEach(t => allTags.add(t));
+            });
+            const tagContainer = document.getElementById('allTagsContainer');
+            tagContainer.innerHTML = Array.from(allTags).map(t => `
+                <button onclick="toggleTag('${t}')" class="px-4 py-1.5 rounded-full text-[11px] font-bold border-2 transition-all whitespace-nowrap shadow-sm
+                ${filters.activeTag === t ? 'bg-brand-500 border-brand-500 text-white' : 'bg-white border-brand-100 text-brand-600'}">
+                    #${t}
                 </button>
             `).join('');
 
@@ -231,21 +236,22 @@
                 const d = (userPos && shop.lat) ? getDistance(userPos.lat, userPos.lng, shop.lat, shop.lng) : null;
                 const distStr = d !== null ? (d < 1 ? Math.round(d*1000)+'m' : d.toFixed(1)+'km') : '';
                 const open = isOpening(shop);
-                const days = ["日","月","火","水","木","金","土"].map((d, i) => `<span class="${shop.openDays.includes(i) ? 'text-brand-600 font-bold' : 'text-gray-200'}">${d}</span>`).join(' ');
                 return `
                 <div class="bg-white rounded-[2rem] shadow-sm border border-brand-100 p-6 relative transition-all active:scale-[0.99]">
-                    <div class="flex justify-between items-start mb-3">
+                    <div class="flex justify-between items-start mb-2">
                         <span class="text-[10px] font-black bg-brand-50 text-brand-600 px-3 py-1.5 rounded-full uppercase tracking-wider">${shop.genre}</span>
                         <div class="flex gap-4 text-gray-300"><button onclick="editShop(${shop.id})"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteShop(${shop.id})"><i class="fa-solid fa-trash"></i></button></div>
                     </div>
                     <h3 class="text-xl font-black text-slate-800 leading-tight mb-1">${shop.name}</h3>
-                    <div class="flex items-center gap-3 mb-4">
+                    <div class="flex items-center gap-3 mb-3">
                         <span class="text-yellow-400 text-sm">${'★'.repeat(shop.rating)}${'☆'.repeat(5-shop.rating)}</span>
                         ${distStr ? `<span class="text-[11px] font-black text-brand-500 bg-brand-50 px-2 py-0.5 rounded-md">${distStr}</span>` : ''}
                         <span class="text-[10px] font-black ${open ? 'text-green-500' : 'text-gray-300'} uppercase">● ${open ? 'OPEN' : 'CLOSED'}</span>
                     </div>
+                    
+                    ${shop.tags && shop.tags.length > 0 ? `<div class="flex flex-wrap gap-1 mb-3">${shop.tags.map(t => `<span class="text-[10px] font-bold text-slate-400">#${t}</span>`).join('')}</div>` : ''}
+
                     <div class="bg-slate-50 rounded-2xl p-4 mb-5 space-y-2 border border-gray-50">
-                        <div class="text-[10px] flex justify-between px-1">${days}</div>
                         <div class="text-xs font-bold text-slate-600 flex items-center gap-2"><i class="fa-regular fa-clock text-brand-500"></i> ${shop.times.filter(t=>t.open).map(t=>`${t.open}-${t.close}`).join(' / ')}</div>
                         ${shop.memo ? `<div class="text-[11px] text-slate-500 pt-1 border-t border-gray-200/50 mt-1 italic">"${shop.memo}"</div>` : ''}
                         ${shop.address ? `<div class="text-[10px] text-slate-400 flex items-start gap-2 pt-1"><i class="fa-solid fa-location-dot mt-0.5 text-brand-200"></i><span class="flex-1">${shop.address}</span></div>` : ''}
@@ -257,7 +263,7 @@
                 </div>`;
             }).join('');
             
-            const gList = [...new Set([...["和食", "洋食", "ラーメン", "カレー", "カフェ", "居酒屋", "スイーツ"], ...getShops().map(s => s.genre)])];
+            const gList = [...new Set([...["和食", "洋食", "ラーメン", "カフェ", "居酒屋"], ...getShops().map(s => s.genre)])];
             document.getElementById('genreList').innerHTML = gList.map(g => `<option value="${g}">`).join('');
         }
 
@@ -266,7 +272,6 @@
             if (!isEdit) {
                 document.getElementById('shopForm').reset();
                 document.getElementById('editId').value = ''; document.getElementById('lat').value = ''; document.getElementById('lng').value = '';
-                for(let i=0; i<7; i++) document.getElementById(`d${i}`).checked = true;
                 document.getElementById('formTitle').innerText = 'お店を記録';
             }
         }
@@ -274,14 +279,18 @@
         document.getElementById('shopForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const shops = getShops(), editId = document.getElementById('editId').value;
+            const rawTags = document.getElementById('shopTags').value;
+            const tagArray = rawTags ? rawTags.split(/[ ,，、\s]+/).filter(t => t !== "") : [];
+            
             const shopData = {
                 id: editId ? Number(editId) : Date.now(),
                 name: document.getElementById('shopName').value,
                 genre: document.getElementById('shopGenre').value || 'その他',
                 rating: Number(document.getElementById('shopRating').value),
-                openDays: [0,1,2,3,4,5,6].filter(i => document.getElementById(`d${i}`).checked),
+                openDays: [0,1,2,3,4,5,6], // シンプル化のため全日営業を初期値に（必要ならチェックボックス復活可）
                 times: [{open: document.getElementById('open1').value, close: document.getElementById('close1').value}, {open: document.getElementById('open2').value, close: document.getElementById('close2').value}],
                 address: document.getElementById('shopAddress').value,
+                tags: tagArray,
                 memo: document.getElementById('shopMemo').value,
                 url: document.getElementById('shopUrl').value,
                 lat: document.getElementById('lat').value, lng: document.getElementById('lng').value,
@@ -298,6 +307,7 @@
             document.getElementById('editId').value = shop.id;
             document.getElementById('shopName').value = shop.name;
             document.getElementById('shopAddress').value = shop.address || '';
+            document.getElementById('shopTags').value = shop.tags ? shop.tags.join(', ') : '';
             document.getElementById('shopMemo').value = shop.memo || '';
             document.getElementById('shopUrl').value = shop.url || '';
             document.getElementById('lat').value = shop.lat || ''; document.getElementById('lng').value = shop.lng || '';
@@ -307,14 +317,12 @@
             document.getElementById('close1').value = shop.times[0].close;
             document.getElementById('open2').value = shop.times[1]?.open || '';
             document.getElementById('close2').value = shop.times[1]?.close || '';
-            const checkboxes = [0,1,2,3,4,5,6];
-            checkboxes.forEach(i => document.getElementById(`d${i}`).checked = shop.openDays.includes(i));
             document.getElementById('formTitle').innerText = '情報を修正';
             toggleForm(true);
         }
 
         function deleteShop(id) { if(confirm('削除しますか？')) { localStorage.setItem(STORAGE_KEY, JSON.stringify(getShops().filter(s=>s.id!==id))); renderList(); } }
-        function clearSearch() { document.getElementById('searchInput').value = ''; filters.genre = null; filters.now = filters.near = false; updateBtnStyles(); renderList(); }
+        function clearSearch() { document.getElementById('searchInput').value = ''; filters.activeTag = null; filters.now = filters.near = false; updateBtnStyles(); renderList(); }
         document.addEventListener('DOMContentLoaded', renderList);
     </script>
 </body>
