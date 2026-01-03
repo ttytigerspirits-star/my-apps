@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gourmet Note Smart v4</title>
+    <title>Gourmet Note Expert v5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -16,99 +16,116 @@
         }
     </script>
     <style>
-        input[type="checkbox"]:checked + label { background-color: #f97316; color: white; border-color: #f97316; }
+        .day-checkbox:checked + label { background-color: #f97316; color: white; border-color: #f97316; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="bg-brand-50 text-slate-700 font-sans pb-20">
 
     <header class="bg-brand-500 text-white shadow-lg sticky top-0 z-30">
         <div class="max-w-md mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold"><i class="fa-solid fa-utensils"></i> My Gourmet</h1>
-            <button onclick="toggleForm()" class="bg-white text-brand-500 px-3 py-1 rounded-full text-sm font-bold shadow">
+            <h1 class="text-xl font-bold"><i class="fa-solid fa-utensils text-brand-100"></i> My Gourmet</h1>
+            <button onclick="toggleForm()" class="bg-white text-brand-500 px-4 py-1.5 rounded-full text-sm font-bold shadow-md active:scale-95 transition">
                 <i class="fa-solid fa-plus"></i> 追加
             </button>
         </div>
     </header>
 
     <main class="max-w-md mx-auto px-4 mt-6">
-        <div class="mb-6 space-y-2">
-            <input type="text" id="searchInput" oninput="renderList()" placeholder="店名やタグで検索..." 
-                class="w-full px-4 py-3 border-2 border-brand-100 rounded-xl focus:ring-2 focus:ring-brand-500 bg-white shadow-sm outline-none">
-            <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar text-xs">
-                <button onclick="filterByNow()" class="whitespace-nowrap bg-white border border-brand-500 text-brand-500 px-3 py-1 rounded-full font-bold shadow-sm active:bg-brand-500 active:text-white">🕒 いま営業中</button>
-                <button onclick="clearSearch()" class="whitespace-nowrap bg-gray-100 text-gray-500 px-3 py-1 rounded-full font-bold">リセット</button>
+        <div class="mb-6 space-y-3">
+            <input type="text" id="searchInput" oninput="renderList()" placeholder="店名やジャンルで検索..." 
+                class="w-full px-4 py-3 border-2 border-brand-100 rounded-2xl focus:ring-2 focus:ring-brand-500 bg-white shadow-sm outline-none">
+            <div class="flex gap-2 text-xs">
+                <button id="filterNowBtn" onclick="filterByNow()" class="flex-1 py-2 rounded-xl font-bold shadow-sm border transition flex items-center justify-center gap-2 bg-white border-gray-200 text-gray-500">
+                    <i class="fa-solid fa-clock"></i> いま営業中
+                </button>
+                <button onclick="clearSearch()" class="px-4 py-2 bg-gray-100 text-gray-500 rounded-xl font-bold">リセット</button>
             </div>
         </div>
 
-        <div id="formContainer" class="hidden fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
-            <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl overflow-y-auto max-h-[90vh]">
-                <div class="p-5 border-b flex justify-between items-center">
-                    <h2 id="formTitle" class="font-bold text-brand-600">お店を記録する</h2>
-                    <button onclick="toggleForm()" class="text-gray-400 text-xl">×</button>
+        <div id="formContainer" class="hidden fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]">
+                <div class="p-5 border-b sticky top-0 bg-white z-10 flex justify-between items-center">
+                    <h2 id="formTitle" class="font-bold text-lg text-brand-600">お店を記録する</h2>
+                    <button onclick="toggleForm()" class="bg-gray-100 text-gray-500 w-8 h-8 rounded-full flex items-center justify-center">×</button>
                 </div>
-                <form id="shopForm" class="p-5 space-y-4 text-sm">
+                <form id="shopForm" class="p-5 space-y-5 text-sm">
                     <input type="hidden" id="editId">
-                    <div>
-                        <label class="block font-bold text-gray-500 mb-1">店名 *</label>
-                        <input type="text" id="shopName" required class="w-full px-3 py-2 border rounded-lg outline-none">
-                    </div>
                     
                     <div>
-                        <label class="block font-bold text-gray-500 mb-1">営業曜日 (タップで選択)</label>
+                        <label class="block font-bold text-gray-600 mb-1">店名 *</label>
+                        <input type="text" id="shopName" required class="w-full px-3 py-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-brand-500 border-gray-200">
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-gray-600 mb-2">営業曜日 (タップで選択)</label>
                         <div class="flex justify-between gap-1">
-                            <input type="checkbox" id="d0" value="0" class="hidden"><label for="d0" class="flex-1 text-center py-2 border rounded-md text-xs">日</label>
-                            <input type="checkbox" id="d1" value="1" class="hidden"><label for="d1" class="flex-1 text-center py-2 border rounded-md text-xs">月</label>
-                            <input type="checkbox" id="d2" value="2" class="hidden"><label for="d2" class="flex-1 text-center py-2 border rounded-md text-xs">火</label>
-                            <input type="checkbox" id="d3" value="3" class="hidden"><label for="d3" class="flex-1 text-center py-2 border rounded-md text-xs">水</label>
-                            <input type="checkbox" id="d4" value="4" class="hidden"><label for="d4" class="flex-1 text-center py-2 border rounded-md text-xs">木</label>
-                            <input type="checkbox" id="d5" value="5" class="hidden"><label for="d5" class="flex-1 text-center py-2 border rounded-md text-xs">金</label>
-                            <input type="checkbox" id="d6" value="6" class="hidden"><label for="d6" class="flex-1 text-center py-2 border rounded-md text-xs">土</label>
+                            <input type="checkbox" id="d0" value="0" class="day-checkbox hidden" checked><label for="d0" class="flex-1 text-center py-2 border rounded-lg text-xs cursor-pointer border-gray-200">日</label>
+                            <input type="checkbox" id="d1" value="1" class="day-checkbox hidden" checked><label for="d1" class="flex-1 text-center py-2 border rounded-lg text-xs cursor-pointer border-gray-200">月</label>
+                            <input type="checkbox" id="d2" value="2" class="day-checkbox hidden" checked><label for="d2" class="flex-1 text-center py-2 border rounded-lg text-xs cursor-pointer border-gray-200">火</label>
+                            <input type="checkbox" id="d3" value="3" class="day-checkbox hidden" checked><label for="d3" class="flex-1 text-center py-2 border rounded-lg text-xs cursor-pointer border-gray-200">水</label>
+                            <input type="checkbox" id="d4" value="4" class="day-checkbox hidden" checked><label for="d4" class="flex-1 text-center py-2 border rounded-lg text-xs cursor-pointer border-gray-200">木</label>
+                            <input type="checkbox" id="d5" value="5" class="day-checkbox hidden" checked><label for="d5" class="flex-1 text-center py-2 border rounded-lg text-xs cursor-pointer border-gray-200">金</label>
+                            <input type="checkbox" id="d6" value="6" class="day-checkbox hidden" checked><label for="d6" class="flex-1 text-center py-2 border rounded-lg text-xs cursor-pointer border-gray-200">土</label>
+                        </div>
+                    </div>
+
+                    <div class="bg-brand-50 p-3 rounded-2xl space-y-3 border border-brand-100">
+                        <p class="text-[10px] font-bold text-brand-600">営業時間 (中休み対応)</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-[10px] text-gray-400">開店1</label>
+                                <input type="time" id="open1" value="11:00" class="w-full p-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-400">閉店1</label>
+                                <input type="time" id="close1" value="15:00" class="w-full p-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-400">開店2 (任意)</label>
+                                <input type="time" id="open2" class="w-full p-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-gray-400">閉店2 (任意)</label>
+                                <input type="time" id="close2" class="w-full p-2 border rounded-lg">
+                            </div>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block font-bold text-gray-500 mb-1">開店時間</label>
-                            <input type="time" id="openTime" value="11:00" class="w-full px-3 py-2 border rounded-lg">
+                            <label class="block font-bold text-gray-600 mb-1">ジャンル</label>
+                            <input type="text" id="shopGenre" list="genreList" class="w-full px-3 py-2 border rounded-xl bg-white" placeholder="例: ラーメン">
+                            <datalist id="genreList">
+                                <option value="和食"><option value="イタリアン"><option value="カレー"><option value="カフェ">
+                            </datalist>
                         </div>
                         <div>
-                            <label class="block font-bold text-gray-500 mb-1">閉店時間</label>
-                            <input type="time" id="closeTime" value="22:00" class="w-full px-3 py-2 border rounded-lg">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block font-bold text-gray-500 mb-1">住所 / URL</label>
-                        <input type="text" id="shopAddress" placeholder="住所" class="w-full px-3 py-2 border rounded-lg mb-2">
-                        <input type="url" id="shopUrl" placeholder="URL" class="w-full px-3 py-2 border rounded-lg">
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block font-bold text-gray-500 mb-1">ジャンル</label>
-                            <select id="shopGenre" class="w-full px-3 py-2 border rounded-lg bg-white">
-                                <option>和食</option><option>洋食</option><option>中華</option><option>イタリアン</option>
-                                <option>ラーメン</option><option>カレー</option><option>カフェ</option><option>その他</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-500 mb-1">評価</label>
-                            <select id="shopRating" class="w-full px-3 py-2 border rounded-lg bg-white text-yellow-500">
+                            <label class="block font-bold text-gray-600 mb-1">評価</label>
+                            <select id="shopRating" class="w-full px-3 py-2 border rounded-xl bg-white text-yellow-500">
                                 <option value="5">★★★★★</option><option value="4">★★★★☆</option><option value="3" selected>★★★☆☆</option>
                             </select>
                         </div>
                     </div>
-                    <button type="submit" class="w-full bg-brand-500 text-white font-bold py-3 rounded-xl shadow-lg mt-2">保存する</button>
+
+                    <div>
+                        <label class="block font-bold text-gray-600 mb-1">リンク情報</label>
+                        <input type="text" id="shopAddress" placeholder="住所" class="w-full px-3 py-2 border rounded-xl mb-2 border-gray-200">
+                        <input type="url" id="shopUrl" placeholder="URL" class="w-full px-3 py-2 border rounded-xl border-gray-200">
+                    </div>
+
+                    <button type="submit" class="w-full bg-brand-500 text-white font-bold py-4 rounded-2xl shadow-lg active:bg-brand-600 transition">
+                        保存する
+                    </button>
                 </form>
             </div>
         </div>
 
-        <div id="shopList" class="space-y-4"></div>
+        <div id="shopList" class="space-y-5"></div>
     </main>
 
     <script>
-        const STORAGE_KEY = 'myGourmetApp_v4';
-        const form = document.getElementById('shopForm');
+        const STORAGE_KEY = 'myGourmetApp_v5';
         let currentFilterNow = false;
 
         function getShops() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
@@ -116,13 +133,15 @@
         function toggleForm(isEdit = false) {
             document.getElementById('formContainer').classList.toggle('hidden');
             if (!isEdit) {
-                form.reset();
+                document.getElementById('shopForm').reset();
                 document.getElementById('editId').value = '';
+                // デフォルトで全曜日チェック
+                for(let i=0; i<7; i++) document.getElementById(`d${i}`).checked = true;
                 document.getElementById('formTitle').innerText = 'お店を記録する';
             }
         }
 
-        form.addEventListener('submit', (e) => {
+        document.getElementById('shopForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const shops = getShops();
             const editId = document.getElementById('editId').value;
@@ -132,11 +151,13 @@
             const shopData = {
                 id: editId ? Number(editId) : Date.now(),
                 name: document.getElementById('shopName').value,
-                genre: document.getElementById('shopGenre').value,
+                genre: document.getElementById('shopGenre').value || 'その他',
                 rating: document.getElementById('shopRating').value,
                 openDays: openDays,
-                openTime: document.getElementById('openTime').value,
-                closeTime: document.getElementById('closeTime').value,
+                times: [
+                    { open: document.getElementById('open1').value, close: document.getElementById('close1').value },
+                    { open: document.getElementById('open2').value, close: document.getElementById('close2').value }
+                ],
                 address: document.getElementById('shopAddress').value,
                 url: document.getElementById('shopUrl').value,
                 date: new Date().toLocaleDateString('ja-JP')
@@ -160,8 +181,10 @@
             document.getElementById('shopName').value = shop.name;
             document.getElementById('shopGenre').value = shop.genre;
             document.getElementById('shopRating').value = shop.rating;
-            document.getElementById('openTime').value = shop.openTime;
-            document.getElementById('closeTime').value = shop.closeTime;
+            document.getElementById('open1').value = shop.times[0].open;
+            document.getElementById('close1').value = shop.times[0].close;
+            document.getElementById('open2').value = shop.times[1]?.open || '';
+            document.getElementById('close2').value = shop.times[1]?.close || '';
             document.getElementById('shopAddress').value = shop.address || '';
             document.getElementById('shopUrl').value = shop.url || '';
             for(let i=0; i<7; i++) { document.getElementById(`d${i}`).checked = shop.openDays.includes(i); }
@@ -172,36 +195,43 @@
         function isOpening(shop) {
             const now = new Date();
             const day = now.getDay();
-            const time = now.getHours() * 100 + now.getMinutes();
-            const open = Number(shop.openTime.replace(':', ''));
-            const close = Number(shop.closeTime.replace(':', ''));
-            
-            const isDayMatch = shop.openDays.includes(day);
-            const isTimeMatch = (time >= open && time <= close);
-            return isDayMatch && isTimeMatch;
+            const currentTime = now.getHours() * 100 + now.getMinutes();
+            if (!shop.openDays.includes(day)) return false;
+
+            return shop.times.some(t => {
+                if (!t.open || !t.close) return false;
+                const o = Number(t.open.replace(':', ''));
+                const c = Number(t.close.replace(':', ''));
+                return currentTime >= o && currentTime <= c;
+            });
         }
 
         function filterByNow() {
             currentFilterNow = !currentFilterNow;
+            const btn = document.getElementById('filterNowBtn');
+            if (currentFilterNow) {
+                btn.classList.replace('bg-white', 'bg-brand-500');
+                btn.classList.replace('text-gray-500', 'text-white');
+                btn.classList.replace('border-gray-200', 'border-brand-500');
+            } else {
+                btn.classList.replace('bg-brand-500', 'bg-white');
+                btn.classList.replace('text-white', 'text-gray-500');
+                btn.classList.replace('border-brand-500', 'border-gray-200');
+            }
             renderList();
         }
 
         function clearSearch() {
             document.getElementById('searchInput').value = '';
-            currentFilterNow = false;
+            if(currentFilterNow) filterByNow();
             renderList();
         }
 
         function renderList() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             let shops = getShops();
-
-            if (query) {
-                shops = shops.filter(s => s.name.toLowerCase().includes(query));
-            }
-            if (currentFilterNow) {
-                shops = shops.filter(s => isOpening(s));
-            }
+            if (query) shops = shops.filter(s => s.name.toLowerCase().includes(query) || s.genre.toLowerCase().includes(query));
+            if (currentFilterNow) shops = shops.filter(s => isOpening(s));
             
             const list = document.getElementById('shopList');
             list.innerHTML = '';
@@ -209,30 +239,35 @@
             shops.forEach(shop => {
                 const isOpen = isOpening(shop);
                 const dayLabels = ["日","月","火","水","木","金","土"];
-                const dayHtml = dayLabels.map((d, i) => `<span class="${shop.openDays.includes(i) ? 'text-brand-600 font-bold' : 'text-gray-300'}">${d}</span>`).join(' ');
+                const dayHtml = dayLabels.map((d, i) => `<span class="${shop.openDays.includes(i) ? 'text-brand-600 font-bold' : 'text-gray-200'}">${d}</span>`).join(' ');
+                const timeHtml = shop.times.filter(t => t.open).map(t => `${t.open}-${t.close}`).join(' / ');
                 
                 list.innerHTML += `
-                    <div class="bg-white rounded-2xl shadow-sm border border-brand-100 p-5 relative">
-                        <div class="flex justify-between items-start mb-2">
-                            <div class="flex gap-2">
-                                <span class="text-[10px] font-bold bg-brand-50 text-brand-600 px-2 py-0.5 rounded">${shop.genre}</span>
-                                <span class="text-[10px] font-bold ${isOpen ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'} px-2 py-0.5 rounded">
-                                    ${isOpen ? '● 営業中' : '○ 営業時間外'}
-                                </span>
-                            </div>
-                            <div class="flex gap-4">
-                                <button onclick="editShop(${shop.id})" class="text-gray-300"><i class="fa-solid fa-pen"></i></button>
+                    <div class="bg-white rounded-[2rem] shadow-sm border border-brand-100 p-6 relative overflow-hidden">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-[10px] font-bold bg-brand-50 text-brand-600 px-3 py-1 rounded-full">${shop.genre}</span>
+                            <div class="flex gap-4 text-gray-300">
+                                <button onclick="editShop(${shop.id})"><i class="fa-solid fa-pen-to-square"></i></button>
                             </div>
                         </div>
-                        <h3 class="text-xl font-bold mb-1">${shop.name}</h3>
-                        <div class="text-yellow-400 text-sm mb-2">${'★'.repeat(shop.rating)}</div>
+                        <h3 class="text-xl font-black text-slate-800 mb-1">${shop.name}</h3>
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="text-yellow-400 text-sm">${'★'.repeat(shop.rating)}</span>
+                            <span class="text-[10px] font-bold ${isOpen ? 'text-green-500' : 'text-gray-300'} uppercase">
+                                ${isOpen ? '● Open Now' : '○ Closed'}
+                            </span>
+                        </div>
                         
-                        <div class="text-[11px] text-slate-500 mb-1 flex gap-2"><span>${dayHtml}</span></div>
-                        <div class="text-sm text-slate-600 mb-4 font-mono font-bold">${shop.openTime} - ${shop.closeTime}</div>
+                        <div class="bg-slate-50 rounded-2xl p-3 mb-5 space-y-1">
+                            <div class="text-[10px] flex justify-between">${dayHtml}</div>
+                            <div class="text-xs font-bold text-slate-600 flex items-center gap-1">
+                                <i class="fa-regular fa-clock text-brand-500"></i> ${timeHtml}
+                            </div>
+                        </div>
 
-                        <div class="grid grid-cols-2 gap-3">
-                            ${shop.address ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.address)}" target="_blank" class="bg-blue-50 text-blue-600 py-3 rounded-xl text-center text-xs font-bold"><i class="fa-solid fa-location-dot"></i> 地図</a>` : ''}
-                            ${shop.url ? `<a href="${shop.url}" target="_blank" class="bg-green-50 text-green-600 py-3 rounded-xl text-center text-xs font-bold"><i class="fa-solid fa-link"></i> サイト</a>` : ''}
+                        <div class="flex gap-3">
+                            ${shop.address ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.address)}" target="_blank" class="flex-1 bg-brand-100 text-brand-600 py-3 rounded-2xl text-center text-xs font-bold active:scale-95 transition">地図アプリ</a>` : ''}
+                            ${shop.url ? `<a href="${shop.url}" target="_blank" class="flex-1 bg-slate-800 text-white py-3 rounded-2xl text-center text-xs font-bold active:scale-95 transition">サイト</a>` : ''}
                         </div>
                     </div>
                 `;
