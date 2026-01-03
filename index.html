@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gourmet Note Smart v7</title>
+    <title>Gourmet Note Geo v8</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -35,125 +35,175 @@
         <div class="mb-6 space-y-3">
             <input type="text" id="searchInput" oninput="renderList()" placeholder="店名、ジャンル、住所で検索..." 
                 class="w-full px-4 py-3 border-2 border-brand-100 rounded-2xl focus:ring-2 focus:ring-brand-500 bg-white shadow-sm outline-none">
-            <div class="flex gap-2 text-xs">
-                <button id="filterNowBtn" onclick="filterByNow()" class="flex-1 py-2 rounded-xl font-bold shadow-sm border transition flex items-center justify-center gap-2 bg-white border-gray-200 text-gray-500">
-                    <i class="fa-solid fa-clock"></i> いま営業中
-                </button>
-                <button onclick="clearSearch()" class="px-4 py-2 bg-gray-100 text-gray-500 rounded-xl font-bold">リセット</button>
-            </div>
-        </div>
-
-        <div id="formContainer" class="hidden fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4">
-            <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]">
-                <div class="p-5 border-b sticky top-0 bg-white z-10 flex justify-between items-center">
-                    <h2 id="formTitle" class="font-bold text-lg text-brand-600">お店を記録する</h2>
-                    <button onclick="toggleForm()" class="bg-gray-100 text-gray-500 w-8 h-8 rounded-full flex items-center justify-center">×</button>
-                </div>
-                <form id="shopForm" class="p-5 space-y-5 text-sm">
-                    <input type="hidden" id="editId">
-                    
-                    <div>
-                        <label class="block font-bold text-gray-600 mb-1">店名 *</label>
-                        <input type="text" id="shopName" required class="w-full px-3 py-2.5 border rounded-xl outline-none focus:ring-2 focus:ring-brand-500 border-gray-200">
-                    </div>
-
-                    <div>
-                        <label class="block font-bold text-gray-600 mb-2">営業曜日 (タップで選択)</label>
-                        <div class="flex justify-between gap-1">
-                            <input type="checkbox" id="d0" value="0" class="day-checkbox hidden" checked><label for="d0" class="flex-1 text-center py-2 border rounded-lg text-xs cursor-pointer border-gray-200">日</label>
-                            <input type="checkbox" id="d1" value="1" class="day-checkbox hidden" checked><label for="d1" class="flex-1 text-center py-2 border rounded-lg text-xs cursor-pointer border-gray-200">月</label>
-                            <input type="checkbox" id="d2" value="2" class="day-checkbox hidden" checked><label for="d2" class="flex-1 text-center py-2 border rounded-lg text-xs cursor-pointer border-gray-200">火</label>
-                            <input type="checkbox" id="d3" value="3" class="day-checkbox hidden" checked><label for="d3" class="flex-1 text-center py-2 border rounded-lg text-xs cursor-pointer border-gray-200">水</label>
-                            <input type="checkbox" id="d4" value="4" class="day-checkbox hidden" checked><label for="d4" class="flex-1 text-center py-2 border rounded-lg text-xs cursor-pointer border-gray-200">木</label>
-                            <input type="checkbox" id="d5" value="5" class="day-checkbox hidden" checked><label for="d5" class="flex-1 text-center py-2 border rounded-lg text-xs cursor-pointer border-gray-200">金</label>
-                            <input type="checkbox" id="d6" value="6" class="day-checkbox hidden" checked><label for="d6" class="flex-1 text-center py-2 border rounded-lg text-xs cursor-pointer border-gray-200">土</label>
-                        </div>
-                    </div>
-
-                    <div class="bg-brand-50 p-3 rounded-2xl space-y-3 border border-brand-100">
-                        <p class="text-[10px] font-bold text-brand-600 text-center">営業時間 (中休み・深夜対応)</p>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="text-[10px] text-gray-400">開店1</label>
-                                <input type="time" id="open1" value="11:00" onchange="autoFillTime()" class="w-full p-2 border rounded-lg">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-gray-400">閉店1</label>
-                                <input type="time" id="close1" value="15:00" onchange="autoFillTime()" class="w-full p-2 border rounded-lg">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-gray-400">開店2</label>
-                                <input type="time" id="open2" class="w-full p-2 border rounded-lg">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-gray-400">閉店2</label>
-                                <input type="time" id="close2" class="w-full p-2 border rounded-lg">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block font-bold text-gray-600 mb-1">ジャンル</label>
-                            <input type="text" id="shopGenre" list="genreList" class="w-full px-3 py-2 border rounded-xl bg-white border-gray-200" placeholder="和食, ラーメン...">
-                            <datalist id="genreList">
-                                </datalist>
-                        </div>
-                        <div>
-                            <label class="block font-bold text-gray-600 mb-1">評価</label>
-                            <select id="shopRating" class="w-full px-3 py-2 border rounded-xl bg-white text-yellow-500">
-                                <option value="5">★★★★★</option><option value="4">★★★★☆</option><option value="3" selected>★★★☆☆</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block font-bold text-gray-600 mb-1">リンク情報</label>
-                        <input type="text" id="shopAddress" placeholder="住所" class="w-full px-3 py-2 border rounded-xl mb-2 border-gray-200">
-                        <input type="url" id="shopUrl" placeholder="URL" class="w-full px-3 py-2 border rounded-xl border-gray-200">
-                    </div>
-
-                    <button type="submit" class="w-full bg-brand-500 text-white font-bold py-4 rounded-2xl shadow-lg active:bg-brand-600 transition">
-                        保存する
-                    </button>
-                </form>
+            <div class="flex gap-2 text-[10px]">
+                <button id="filterNowBtn" onclick="toggleFilter('now')" class="flex-1 py-2 rounded-xl font-bold border transition bg-white border-gray-200 text-gray-500">🕒 営業中</button>
+                <button id="sortNearBtn" onclick="toggleFilter('near')" class="flex-1 py-2 rounded-xl font-bold border transition bg-white border-gray-200 text-gray-500">📍 近い順</button>
+                <button onclick="clearSearch()" class="px-3 py-2 bg-gray-100 text-gray-500 rounded-xl font-bold">リセット</button>
             </div>
         </div>
 
         <div id="shopList" class="space-y-5"></div>
     </main>
 
+    <div id="formContainer" class="hidden fixed inset-0 bg-black/60 z-40 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]">
+            <div class="p-5 border-b sticky top-0 bg-white z-10 flex justify-between items-center">
+                <h2 id="formTitle" class="font-bold text-brand-600">お店を記録</h2>
+                <button onclick="toggleForm()" class="text-gray-400">×</button>
+            </div>
+            <form id="shopForm" class="p-5 space-y-4 text-sm">
+                <input type="hidden" id="editId">
+                <input type="hidden" id="lat"><input type="hidden" id="lng">
+                
+                <div>
+                    <label class="block font-bold text-gray-500 mb-1">店名 *</label>
+                    <input type="text" id="shopName" required class="w-full px-3 py-2 border rounded-xl border-gray-200">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-500 mb-2">営業曜日</label>
+                    <div class="flex justify-between gap-1">
+                        <input type="checkbox" id="d0" value="0" class="day-checkbox hidden" checked><label for="d0" class="flex-1 text-center py-2 border rounded-lg text-[10px]">日</label>
+                        <input type="checkbox" id="d1" value="1" class="day-checkbox hidden" checked><label for="d1" class="flex-1 text-center py-2 border rounded-lg text-[10px]">月</label>
+                        <input type="checkbox" id="d2" value="2" class="day-checkbox hidden" checked><label for="d2" class="flex-1 text-center py-2 border rounded-lg text-[10px]">火</label>
+                        <input type="checkbox" id="d3" value="3" class="day-checkbox hidden" checked><label for="d3" class="flex-1 text-center py-2 border rounded-lg text-[10px]">水</label>
+                        <input type="checkbox" id="d4" value="4" class="day-checkbox hidden" checked><label for="d4" class="flex-1 text-center py-2 border rounded-lg text-[10px]">木</label>
+                        <input type="checkbox" id="d5" value="5" class="day-checkbox hidden" checked><label for="d5" class="flex-1 text-center py-2 border rounded-lg text-[10px]">金</label>
+                        <input type="checkbox" id="d6" value="6" class="day-checkbox hidden" checked><label for="d6" class="flex-1 text-center py-2 border rounded-lg text-[10px]">土</label>
+                    </div>
+                </div>
+
+                <div class="bg-brand-50 p-3 rounded-2xl grid grid-cols-2 gap-2">
+                    <input type="time" id="open1" value="11:00" class="p-2 border rounded-lg">
+                    <input type="time" id="close1" value="15:00" class="p-2 border rounded-lg">
+                    <input type="time" id="open2" class="p-2 border rounded-lg">
+                    <input type="time" id="close2" class="p-2 border rounded-lg">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-500 mb-1">URL (貼り付けると座標を自動取得)</label>
+                    <input type="url" id="shopUrl" oninput="extractCoords(this.value)" placeholder="Googleマップの共有URLなど" class="w-full px-3 py-2 border rounded-xl border-gray-200">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-gray-500 mb-1">住所</label>
+                    <input type="text" id="shopAddress" class="w-full px-3 py-2 border rounded-xl border-gray-200">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="shopGenre" list="genreList" placeholder="ジャンル" class="px-3 py-2 border rounded-xl">
+                    <select id="shopRating" class="px-3 py-2 border rounded-xl text-yellow-500">
+                        <option value="5">★★★★★</option><option value="4">★★★★☆</option><option value="3" selected>★★★☆☆</option>
+                    </select>
+                </div>
+                <datalist id="genreList"></datalist>
+
+                <button type="submit" class="w-full bg-brand-500 text-white font-bold py-3 rounded-2xl shadow-lg">保存する</button>
+            </form>
+        </div>
+    </div>
+
     <script>
-        const STORAGE_KEY = 'myGourmetApp_v7';
-        let currentFilterNow = false;
+        const STORAGE_KEY = 'myGourmetApp_v8';
+        let filters = { now: false, near: false };
+        let userPos = null;
 
         function getShops() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
 
-        // 時間の自動補完ロジック
-        function autoFillTime() {
-            const close1 = document.getElementById('close1').value;
-            if (!close1) return;
-
-            const [h, m] = close1.split(':').map(Number);
-            
-            // 1時間後を開店2に
-            const open2H = (h + 1) % 24;
-            document.getElementById('open2').value = `${String(open2H).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-            
-            // さらに5時間後を閉店2に
-            const close2H = (open2H + 5) % 24;
-            document.getElementById('close2').value = `${String(close2H).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        // URLから座標を抜き出す魔法の関数
+        function extractCoords(url) {
+            const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
+            const match = url.match(regex);
+            if (match) {
+                document.getElementById('lat').value = match[1];
+                document.getElementById('lng').value = match[2];
+                console.log("座標を取得しました:", match[1], match[2]);
+            }
         }
 
-        // ジャンルリストの更新
-        function updateGenreDatalist() {
-            const defaultGenres = ["和食", "洋食", "中華", "イタリアン", "ラーメン", "カレー", "カフェ", "焼肉", "居酒屋", "スイーツ"];
-            const shops = getShops();
-            const savedGenres = shops.map(s => s.genre);
-            const allGenres = [...new Set([...defaultGenres, ...savedGenres])];
+        // 距離計算 (ハバーシン公式)
+        function getDistance(lat1, lon1, lat2, lon2) {
+            if (!lat1 || !lon1 || !lat2 || !lon2) return Infinity;
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+        async function toggleFilter(type) {
+            filters[type] = !filters[type];
+            if (type === 'near' && filters.near) {
+                navigator.geolocation.getCurrentPosition(p => {
+                    userPos = { lat: p.coords.latitude, lng: p.coords.longitude };
+                    renderList();
+                }, () => alert("位置情報を許可してください"));
+            }
+            updateBtnStyles();
+            renderList();
+        }
+
+        function updateBtnStyles() {
+            ['now', 'near'].forEach(t => {
+                const btn = document.getElementById(t === 'now' ? 'filterNowBtn' : 'sortNearBtn');
+                btn.className = filters[t] ? "flex-1 py-2 rounded-xl font-bold border transition bg-brand-500 border-brand-500 text-white" : "flex-1 py-2 rounded-xl font-bold border transition bg-white border-gray-200 text-gray-500";
+            });
+        }
+
+        function isOpening(shop) {
+            const now = new Date();
+            const day = now.getDay(); 
+            const yesterday = (day + 6) % 7;
+            const toNum = (t) => t ? Number(t.replace(':', '')) : null;
+            const currentTime = now.getHours() * 100 + now.getMinutes();
+            const check = (range, isToday) => {
+                const o = toNum(range.open), c = toNum(range.close);
+                if (o === null || c === null) return false;
+                return (o < c) ? (isToday && currentTime >= o && currentTime <= c) : (isToday ? currentTime >= o : currentTime <= c);
+            };
+            return (shop.openDays.includes(day) && shop.times.some(t => check(t, true))) || (shop.openDays.includes(yesterday) && shop.times.some(t => check(t, false)));
+        }
+
+        function renderList() {
+            let shops = getShops();
+            const query = document.getElementById('searchInput').value.toLowerCase();
             
-            const datalist = document.getElementById('genreList');
-            datalist.innerHTML = allGenres.map(g => `<option value="${g}">`).join('');
+            if (query) shops = shops.filter(s => s.name.toLowerCase().includes(query) || s.genre.toLowerCase().includes(query) || (s.address && s.address.toLowerCase().includes(query)));
+            if (filters.now) shops = shops.filter(s => isOpening(s));
+            
+            if (filters.near && userPos) {
+                shops.sort((a, b) => getDistance(userPos.lat, userPos.lng, a.lat, a.lng) - getDistance(userPos.lat, userPos.lng, b.lat, b.lng));
+            }
+
+            const list = document.getElementById('shopList');
+            list.innerHTML = shops.map(shop => {
+                const dist = userPos && shop.lat ? getDistance(userPos.lat, userPos.lng, shop.lat, shop.lng).toFixed(1) + 'km' : '';
+                const open = isOpening(shop);
+                return `
+                <div class="bg-white rounded-[2rem] shadow-sm border border-brand-100 p-6 relative">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-[10px] font-bold bg-brand-50 text-brand-600 px-3 py-1 rounded-full">${shop.genre}</span>
+                        <div class="flex gap-3 text-gray-300">
+                            <button onclick="editShop(${shop.id})"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteShop(${shop.id})"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-black">${shop.name}</h3>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="text-yellow-400 text-sm">${'★'.repeat(shop.rating)}</span>
+                        ${dist ? `<span class="text-[10px] font-bold text-brand-500"><i class="fa-solid fa-location-arrow"></i> ${dist}</span>` : ''}
+                        <span class="text-[10px] font-bold ${open ? 'text-green-500' : 'text-gray-300'}">${open ? '● OPEN' : '○ CLOSED'}</span>
+                    </div>
+                    <div class="bg-slate-50 rounded-2xl p-3 mb-4 space-y-1">
+                        <div class="text-xs font-bold text-slate-600"><i class="fa-regular fa-clock text-brand-500"></i> ${shop.times.filter(t=>t.open).map(t=>`${t.open}-${t.close}`).join(' / ')}</div>
+                        <div class="text-[10px] text-slate-400 truncate"><i class="fa-solid fa-location-dot"></i> ${shop.address || '住所未登録'}</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.address || shop.name)}" target="_blank" class="flex-1 bg-brand-100 text-brand-600 py-3 rounded-2xl text-center text-xs font-bold">地図</a>
+                        ${shop.url ? `<a href="${shop.url}" target="_blank" class="flex-1 bg-slate-800 text-white py-3 rounded-2xl text-center text-xs font-bold">サイト</a>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
         }
 
         function toggleForm(isEdit = false) {
@@ -161,41 +211,30 @@
             if (!isEdit) {
                 document.getElementById('shopForm').reset();
                 document.getElementById('editId').value = '';
-                for(let i=0; i<7; i++) document.getElementById(`d${i}`).checked = true;
-                document.getElementById('formTitle').innerText = 'お店を記録する';
+                document.getElementById('lat').value = '';
+                document.getElementById('lng').value = '';
             }
-            updateGenreDatalist();
         }
 
         document.getElementById('shopForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const shops = getShops();
             const editId = document.getElementById('editId').value;
-            const openDays = [];
-            for(let i=0; i<7; i++) { if(document.getElementById(`d${i}`).checked) openDays.push(i); }
-            
             const shopData = {
                 id: editId ? Number(editId) : Date.now(),
                 name: document.getElementById('shopName').value,
                 genre: document.getElementById('shopGenre').value || 'その他',
                 rating: document.getElementById('shopRating').value,
-                openDays: openDays,
-                times: [
-                    { open: document.getElementById('open1').value, close: document.getElementById('close1').value },
-                    { open: document.getElementById('open2').value, close: document.getElementById('close2').value }
-                ],
+                openDays: [0,1,2,3,4,5,6].filter(i => document.getElementById(`d${i}`).checked),
+                times: [{open: document.getElementById('open1').value, close: document.getElementById('close1').value}, {open: document.getElementById('open2').value, close: document.getElementById('close2').value}],
                 address: document.getElementById('shopAddress').value,
                 url: document.getElementById('shopUrl').value,
+                lat: document.getElementById('lat').value,
+                lng: document.getElementById('lng').value,
                 date: new Date().toLocaleDateString('ja-JP')
             };
-
-            if (editId) {
-                const index = shops.findIndex(s => s.id === shopData.id);
-                shops[index] = shopData;
-            } else {
-                shops.unshift(shopData);
-            }
-
+            if (editId) shops[shops.findIndex(s => s.id === shopData.id)] = shopData;
+            else shops.unshift(shopData);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(shops));
             toggleForm();
             renderList();
@@ -205,127 +244,16 @@
             const shop = getShops().find(s => s.id === id);
             document.getElementById('editId').value = shop.id;
             document.getElementById('shopName').value = shop.name;
-            document.getElementById('shopGenre').value = shop.genre;
-            document.getElementById('shopRating').value = shop.rating;
-            document.getElementById('open1').value = shop.times[0].open;
-            document.getElementById('close1').value = shop.times[0].close;
-            document.getElementById('open2').value = shop.times[1]?.open || '';
-            document.getElementById('close2').value = shop.times[1]?.close || '';
-            document.getElementById('shopAddress').value = shop.address || '';
+            document.getElementById('lat').value = shop.lat || '';
+            document.getElementById('lng').value = shop.lng || '';
             document.getElementById('shopUrl').value = shop.url || '';
-            for(let i=0; i<7; i++) { document.getElementById(`d${i}`).checked = shop.openDays.includes(i); }
-            document.getElementById('formTitle').innerText = '情報を修正する';
+            document.getElementById('shopAddress').value = shop.address || '';
             toggleForm(true);
         }
 
-        function deleteShop(id) {
-            if(confirm('この記録を削除しますか？')) {
-                const shops = getShops().filter(s => s.id !== id);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(shops));
-                renderList();
-            }
-        }
-
-        function isOpening(shop) {
-            const now = new Date();
-            const day = now.getDay(); 
-            const yesterday = (day + 6) % 7;
-            const toNum = (t) => t ? Number(t.replace(':', '')) : null;
-            const currentTime = now.getHours() * 100 + now.getMinutes();
-
-            const checkTime = (timeRange, isToday, targetTime) => {
-                const open = toNum(timeRange.open);
-                const close = toNum(timeRange.close);
-                if (open === null || close === null) return false;
-
-                if (open < close) {
-                    return isToday && (targetTime >= open && targetTime <= close);
-                } else {
-                    if (isToday) return targetTime >= open; 
-                    else return targetTime <= close;
-                }
-            };
-
-            const todayMatch = shop.openDays.includes(day) && shop.times.some(t => checkTime(t, true, currentTime));
-            const yesterdayMatch = shop.openDays.includes(yesterday) && shop.times.some(t => checkTime(t, false, currentTime));
-            return todayMatch || yesterdayMatch;
-        }
-
-        function filterByNow() {
-            currentFilterNow = !currentFilterNow;
-            const btn = document.getElementById('filterNowBtn');
-            if (currentFilterNow) {
-                btn.className = "flex-1 py-2 rounded-xl font-bold shadow-sm border transition flex items-center justify-center gap-2 bg-brand-500 border-brand-500 text-white";
-            } else {
-                btn.className = "flex-1 py-2 rounded-xl font-bold shadow-sm border transition flex items-center justify-center gap-2 bg-white border-gray-200 text-gray-500";
-            }
-            renderList();
-        }
-
-        function clearSearch() {
-            document.getElementById('searchInput').value = '';
-            if(currentFilterNow) filterByNow();
-            renderList();
-        }
-
-        function renderList() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            let shops = getShops();
-            
-            if (query) {
-                shops = shops.filter(s => 
-                    s.name.toLowerCase().includes(query) || 
-                    s.genre.toLowerCase().includes(query) ||
-                    (s.address && s.address.toLowerCase().includes(query))
-                );
-            }
-            
-            if (currentFilterNow) shops = shops.filter(s => isOpening(s));
-            
-            const list = document.getElementById('shopList');
-            list.innerHTML = '';
-
-            shops.forEach(shop => {
-                const isOpen = isOpening(shop);
-                const dayLabels = ["日","月","火","水","木","金","土"];
-                const dayHtml = dayLabels.map((d, i) => `<span class="${shop.openDays.includes(i) ? 'text-brand-600 font-bold' : 'text-gray-200'}">${d}</span>`).join(' ');
-                const timeHtml = shop.times.filter(t => t.open).map(t => `${t.open}-${t.close}`).join(' / ');
-                
-                list.innerHTML += `
-                    <div class="bg-white rounded-[2rem] shadow-sm border border-brand-100 p-6 relative overflow-hidden">
-                        <div class="flex justify-between items-start mb-3">
-                            <span class="text-[10px] font-bold bg-brand-50 text-brand-600 px-3 py-1 rounded-full">${shop.genre}</span>
-                            <div class="flex gap-4 text-gray-300 text-sm">
-                                <button onclick="editShop(${shop.id})"><i class="fa-solid fa-pen-to-square"></i></button>
-                                <button onclick="deleteShop(${shop.id})"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </div>
-                        <h3 class="text-xl font-black text-slate-800 mb-1">${shop.name}</h3>
-                        <div class="flex items-center gap-2 mb-4">
-                            <span class="text-yellow-400 text-sm">${'★'.repeat(shop.rating)}</span>
-                            <span class="text-[10px] font-bold ${isOpen ? 'text-green-500' : 'text-gray-300'} uppercase">
-                                ${isOpen ? '● Open Now' : '○ Closed'}
-                            </span>
-                        </div>
-                        
-                        <div class="bg-slate-50 rounded-2xl p-3 mb-5 space-y-1">
-                            <div class="text-[10px] flex justify-between">${dayHtml}</div>
-                            <div class="text-xs font-bold text-slate-600 flex items-center gap-1">
-                                <i class="fa-regular fa-clock text-brand-500"></i> ${timeHtml}
-                            </div>
-                            ${shop.address ? `<div class="text-[10px] text-slate-400 truncate mt-1"><i class="fa-solid fa-location-dot"></i> ${shop.address}</div>` : ''}
-                        </div>
-
-                        <div class="flex gap-3">
-                            ${shop.address ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.address)}" target="_blank" class="flex-1 bg-brand-100 text-brand-600 py-3 rounded-2xl text-center text-xs font-bold active:scale-95 transition">地図アプリ</a>` : ''}
-                            ${shop.url ? `<a href="${shop.url}" target="_blank" class="flex-1 bg-slate-800 text-white py-3 rounded-2xl text-center text-xs font-bold active:scale-95 transition">サイト</a>` : ''}
-                        </div>
-                    </div>
-                `;
-            });
-        }
+        function deleteShop(id) { if(confirm('削除しますか？')) { localStorage.setItem(STORAGE_KEY, JSON.stringify(getShops().filter(s=>s.id!==id))); renderList(); } }
+        function clearSearch() { document.getElementById('searchInput').value = ''; filters.now = filters.near = false; updateBtnStyles(); renderList(); }
         document.addEventListener('DOMContentLoaded', renderList);
     </script>
 </body>
 </html>
-
