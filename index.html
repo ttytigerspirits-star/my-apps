@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gourmet Note Geo v13</title>
+    <title>Gourmet Note Geo v14</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -18,6 +18,7 @@
     <style>
         .day-checkbox:checked + label { background-color: #f97316; color: white; border-color: #f97316; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        input[type="time"] { min-height: 44px; } /* タップ領域の確保 */
     </style>
 </head>
 <body class="bg-brand-50 text-slate-700 font-sans pb-24">
@@ -39,8 +40,7 @@
                     class="w-full pl-11 pr-4 py-3 border-2 border-brand-100 rounded-2xl focus:ring-2 focus:ring-brand-500 bg-white shadow-sm outline-none transition-all">
             </div>
             
-            <div id="genreTags" class="flex gap-2 overflow-x-auto no-scrollbar pb-1 pt-1">
-                </div>
+            <div id="genreTags" class="flex gap-2 overflow-x-auto no-scrollbar pb-1 pt-1"></div>
 
             <div class="flex gap-2 text-[11px]">
                 <button id="filterNowBtn" onclick="toggleFilter('now')" class="flex-1 py-2.5 rounded-xl font-bold border transition bg-white border-gray-200 text-gray-500 flex items-center justify-center gap-1.5 shadow-sm">🕒 営業中</button>
@@ -88,16 +88,41 @@
                     </div>
                 </div>
 
-                <div class="bg-brand-50 p-4 rounded-[1.5rem] border border-brand-100 grid grid-cols-2 gap-3">
-                    <div><label class="text-[10px] font-bold text-gray-400">開店1</label><input type="time" id="open1" value="11:00" class="w-full p-2.5 border rounded-lg"></div>
-                    <div><label class="text-[10px] font-bold text-gray-400">閉店1</label><input type="time" id="close1" value="15:00" class="w-full p-2.5 border rounded-lg"></div>
-                    <div><label class="text-[10px] font-bold text-brand-500">開店2 (タップ計算)</label><input type="time" id="open2" onfocus="handleSecondHoursFocus()" class="w-full p-2.5 border rounded-lg"></div>
-                    <div><label class="text-[10px] font-bold text-gray-400">閉店2</label><input type="time" id="close2" class="w-full p-2.5 border rounded-lg"></div>
+                <div class="bg-brand-50 p-4 rounded-[1.5rem] border border-brand-100 space-y-3">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[10px] font-bold text-gray-400 ml-1">開店 1</label>
+                            <input type="time" id="open1" value="11:00" class="w-full px-3 py-2 border rounded-xl bg-white focus:border-brand-500 outline-none">
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[10px] font-bold text-gray-400 ml-1">閉店 1</label>
+                            <input type="time" id="close1" value="15:00" class="w-full px-3 py-2 border rounded-xl bg-white focus:border-brand-500 outline-none">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 pt-1 border-t border-brand-100">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[10px] font-bold text-brand-500 ml-1">開店 2 (タップで計算)</label>
+                            <input type="time" id="open2" onfocus="handleSecondHoursFocus()" class="w-full px-3 py-2 border rounded-xl bg-white focus:border-brand-500 outline-none">
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[10px] font-bold text-gray-400 ml-1">閉店 2</label>
+                            <input type="time" id="close2" class="w-full px-3 py-2 border rounded-xl bg-white focus:border-brand-500 outline-none">
+                        </div>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div><label class="block font-bold text-gray-500 mb-1.5">ジャンル</label><input type="text" id="shopGenre" list="genreList" class="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:border-brand-500 outline-none"></div>
-                    <div><label class="block font-bold text-gray-500 mb-1.5">評価</label><select id="shopRating" class="w-full px-4 py-3 border-2 border-gray-100 rounded-xl bg-white text-yellow-500 font-bold"><option value="5">★★★★★</option><option value="4">★★★★☆</option><option value="3" selected>★★★☆☆</option></select></div>
+                    <div>
+                        <label class="block font-bold text-gray-500 mb-1.5">評価</label>
+                        <select id="shopRating" class="w-full px-4 py-3 border-2 border-gray-100 rounded-xl bg-white text-yellow-500 font-bold outline-none">
+                            <option value="5">★★★★★</option>
+                            <option value="4">★★★★☆</option>
+                            <option value="3" selected>★★★☆☆</option>
+                            <option value="2">★★☆☆☆</option>
+                            <option value="1">★☆☆☆☆</option>
+                        </select>
+                    </div>
                 </div>
                 <datalist id="genreList"></datalist>
 
@@ -114,7 +139,7 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'myGourmetApp_v13';
+        const STORAGE_KEY = 'myGourmetApp_v14';
         let filters = { now: false, near: false, genre: null }, userPos = null;
 
         function getShops() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
@@ -129,7 +154,6 @@
 
         async function searchCoordsByAddress() {
             let addr = document.getElementById('shopAddress').value;
-            const status = document.getElementById('geoStatus');
             if (!addr) return alert("住所を入力してください");
             const searchAddr = addr.split(/[ 　(（]/)[0].replace(/(ビル|階|F|f|棟|号|地下).*$/, "");
             try {
@@ -188,14 +212,11 @@
         function renderList() {
             let shops = getShops();
             const query = document.getElementById('searchInput').value.toLowerCase();
-            
-            // フィルタリング処理
             if (query) shops = shops.filter(s => s.name.toLowerCase().includes(query) || s.genre.toLowerCase().includes(query) || (s.address && s.address.toLowerCase().includes(query)) || (s.memo && s.memo.toLowerCase().includes(query)));
             if (filters.genre) shops = shops.filter(s => s.genre === filters.genre);
             if (filters.now) shops = shops.filter(s => isOpening(s));
             if (filters.near && userPos) shops.sort((a, b) => getDistance(userPos.lat, userPos.lng, a.lat, a.lng) - getDistance(userPos.lat, userPos.lng, b.lat, b.lng));
 
-            // ジャンルタグの生成
             const genres = [...new Set(getShops().map(s => s.genre))];
             const tagContainer = document.getElementById('genreTags');
             tagContainer.innerHTML = genres.map(g => `
@@ -219,7 +240,7 @@
                     </div>
                     <h3 class="text-xl font-black text-slate-800 leading-tight mb-1">${shop.name}</h3>
                     <div class="flex items-center gap-3 mb-4">
-                        <span class="text-yellow-400 text-sm">${'★'.repeat(shop.rating)}</span>
+                        <span class="text-yellow-400 text-sm">${'★'.repeat(shop.rating)}${'☆'.repeat(5-shop.rating)}</span>
                         ${distStr ? `<span class="text-[11px] font-black text-brand-500 bg-brand-50 px-2 py-0.5 rounded-md">${distStr}</span>` : ''}
                         <span class="text-[10px] font-black ${open ? 'text-green-500' : 'text-gray-300'} uppercase">● ${open ? 'OPEN' : 'CLOSED'}</span>
                     </div>
@@ -257,7 +278,7 @@
                 id: editId ? Number(editId) : Date.now(),
                 name: document.getElementById('shopName').value,
                 genre: document.getElementById('shopGenre').value || 'その他',
-                rating: document.getElementById('shopRating').value,
+                rating: Number(document.getElementById('shopRating').value),
                 openDays: [0,1,2,3,4,5,6].filter(i => document.getElementById(`d${i}`).checked),
                 times: [{open: document.getElementById('open1').value, close: document.getElementById('close1').value}, {open: document.getElementById('open2').value, close: document.getElementById('close2').value}],
                 address: document.getElementById('shopAddress').value,
@@ -286,7 +307,8 @@
             document.getElementById('close1').value = shop.times[0].close;
             document.getElementById('open2').value = shop.times[1]?.open || '';
             document.getElementById('close2').value = shop.times[1]?.close || '';
-            for(let i=0; i<7; i++) document.getElementById(`d${i}`).checked = shop.openDays.includes(i);
+            const checkboxes = [0,1,2,3,4,5,6];
+            checkboxes.forEach(i => document.getElementById(`d${i}`).checked = shop.openDays.includes(i));
             document.getElementById('formTitle').innerText = '情報を修正';
             toggleForm(true);
         }
@@ -297,3 +319,4 @@
     </script>
 </body>
 </html>
+
