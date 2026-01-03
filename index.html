@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gourmet Note Expert v5</title>
+    <title>Gourmet Note Perfect v6</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -71,7 +71,7 @@
                     </div>
 
                     <div class="bg-brand-50 p-3 rounded-2xl space-y-3 border border-brand-100">
-                        <p class="text-[10px] font-bold text-brand-600">営業時間 (中休み対応)</p>
+                        <p class="text-[10px] font-bold text-brand-600">営業時間 (中休み・深夜対応)</p>
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="text-[10px] text-gray-400">開店1</label>
@@ -90,15 +90,13 @@
                                 <input type="time" id="close2" class="w-full p-2 border rounded-lg">
                             </div>
                         </div>
+                        <p class="text-[9px] text-gray-400 leading-tight">※深夜5時まで等の場合は閉店時間を「05:00」と入力してください。</p>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block font-bold text-gray-600 mb-1">ジャンル</label>
-                            <input type="text" id="shopGenre" list="genreList" class="w-full px-3 py-2 border rounded-xl bg-white" placeholder="例: ラーメン">
-                            <datalist id="genreList">
-                                <option value="和食"><option value="イタリアン"><option value="カレー"><option value="カフェ">
-                            </datalist>
+                            <input type="text" id="shopGenre" class="w-full px-3 py-2 border rounded-xl bg-white border-gray-200" placeholder="例: ラーメン">
                         </div>
                         <div>
                             <label class="block font-bold text-gray-600 mb-1">評価</label>
@@ -125,7 +123,7 @@
     </main>
 
     <script>
-        const STORAGE_KEY = 'myGourmetApp_v5';
+        const STORAGE_KEY = 'myGourmetApp_v6';
         let currentFilterNow = false;
 
         function getShops() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
@@ -135,7 +133,6 @@
             if (!isEdit) {
                 document.getElementById('shopForm').reset();
                 document.getElementById('editId').value = '';
-                // デフォルトで全曜日チェック
                 for(let i=0; i<7; i++) document.getElementById(`d${i}`).checked = true;
                 document.getElementById('formTitle').innerText = 'お店を記録する';
             }
@@ -192,31 +189,47 @@
             toggleForm(true);
         }
 
+        function deleteShop(id) {
+            if(confirm('この記録を削除しますか？')) {
+                const shops = getShops().filter(s => s.id !== id);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(shops));
+                renderList();
+            }
+        }
+
         function isOpening(shop) {
             const now = new Date();
-            const day = now.getDay();
+            const day = now.getDay(); 
+            const yesterday = (day + 6) % 7;
+            const toNum = (t) => t ? Number(t.replace(':', '')) : null;
             const currentTime = now.getHours() * 100 + now.getMinutes();
-            if (!shop.openDays.includes(day)) return false;
 
-            return shop.times.some(t => {
-                if (!t.open || !t.close) return false;
-                const o = Number(t.open.replace(':', ''));
-                const c = Number(t.close.replace(':', ''));
-                return currentTime >= o && currentTime <= c;
-            });
+            const checkTime = (timeRange, isToday, targetTime) => {
+                const open = toNum(timeRange.open);
+                const close = toNum(timeRange.close);
+                if (open === null || close === null) return false;
+
+                if (open < close) {
+                    return isToday && (targetTime >= open && targetTime <= close);
+                } else {
+                    if (isToday) return targetTime >= open; 
+                    else return targetTime <= close;
+                }
+            };
+
+            const todayMatch = shop.openDays.includes(day) && shop.times.some(t => checkTime(t, true, currentTime));
+            const yesterdayMatch = shop.openDays.includes(yesterday) && shop.times.some(t => checkTime(t, false, currentTime));
+
+            return todayMatch || yesterdayMatch;
         }
 
         function filterByNow() {
             currentFilterNow = !currentFilterNow;
             const btn = document.getElementById('filterNowBtn');
             if (currentFilterNow) {
-                btn.classList.replace('bg-white', 'bg-brand-500');
-                btn.classList.replace('text-gray-500', 'text-white');
-                btn.classList.replace('border-gray-200', 'border-brand-500');
+                btn.className = "flex-1 py-2 rounded-xl font-bold shadow-sm border transition flex items-center justify-center gap-2 bg-brand-500 border-brand-500 text-white";
             } else {
-                btn.classList.replace('bg-brand-500', 'bg-white');
-                btn.classList.replace('text-white', 'text-gray-500');
-                btn.classList.replace('border-brand-500', 'border-gray-200');
+                btn.className = "flex-1 py-2 rounded-xl font-bold shadow-sm border transition flex items-center justify-center gap-2 bg-white border-gray-200 text-gray-500";
             }
             renderList();
         }
@@ -248,6 +261,7 @@
                             <span class="text-[10px] font-bold bg-brand-50 text-brand-600 px-3 py-1 rounded-full">${shop.genre}</span>
                             <div class="flex gap-4 text-gray-300">
                                 <button onclick="editShop(${shop.id})"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button onclick="deleteShop(${shop.id})"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </div>
                         <h3 class="text-xl font-black text-slate-800 mb-1">${shop.name}</h3>
@@ -277,3 +291,4 @@
     </script>
 </body>
 </html>
+
