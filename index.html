@@ -3,175 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Gourmet Note Pro</title>
+    <title>Gourmet Note Smart v4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        brand: { 50: '#fff7ed', 100: '#ffedd5', 500: '#f97316', 600: '#ea580c' }
-                    }
+                    colors: { brand: { 50: '#fff7ed', 100: '#ffedd5', 500: '#f97316', 600: '#ea580c' } }
                 }
             }
         }
     </script>
     <style>
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+        input[type="checkbox"]:checked + label { background-color: #f97316; color: white; border-color: #f97316; }
     </style>
 </head>
-<body class="bg-brand-50 text-slate-700 font-sans pb-10">
+<body class="bg-brand-50 text-slate-700 font-sans pb-20">
 
-    <header class="bg-brand-500 text-white shadow-lg sticky top-0 z-20">
-        <div class="max-w-md mx-auto px-4 py-4">
-            <h1 class="text-xl font-bold text-center flex items-center justify-center gap-2">
-                <i class="fa-solid fa-utensils"></i> My Gourmet Note
-            </h1>
+    <header class="bg-brand-500 text-white shadow-lg sticky top-0 z-30">
+        <div class="max-w-md mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold"><i class="fa-solid fa-utensils"></i> My Gourmet</h1>
+            <button onclick="toggleForm()" class="bg-white text-brand-500 px-3 py-1 rounded-full text-sm font-bold shadow">
+                <i class="fa-solid fa-plus"></i> 追加
+            </button>
         </div>
     </header>
 
     <main class="max-w-md mx-auto px-4 mt-6">
-        
-        <div class="mb-6">
-            <div class="relative">
-                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400"></i>
-                <input type="text" id="searchInput" oninput="renderList()" placeholder="店名やタグで検索..." 
-                    class="w-full pl-10 pr-4 py-2 border-2 border-brand-100 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white shadow-sm">
+        <div class="mb-6 space-y-2">
+            <input type="text" id="searchInput" oninput="renderList()" placeholder="店名やタグで検索..." 
+                class="w-full px-4 py-3 border-2 border-brand-100 rounded-xl focus:ring-2 focus:ring-brand-500 bg-white shadow-sm outline-none">
+            <div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar text-xs">
+                <button onclick="filterByNow()" class="whitespace-nowrap bg-white border border-brand-500 text-brand-500 px-3 py-1 rounded-full font-bold shadow-sm active:bg-brand-500 active:text-white">🕒 いま営業中</button>
+                <button onclick="clearSearch()" class="whitespace-nowrap bg-gray-100 text-gray-500 px-3 py-1 rounded-full font-bold">リセット</button>
             </div>
         </div>
 
-        <details class="bg-white rounded-xl shadow-md mb-8 border border-brand-100 overflow-hidden" id="formDetails">
-            <summary class="list-none p-4 text-brand-600 font-bold cursor-pointer flex justify-between items-center">
-                <span><i class="fa-solid fa-circle-plus mr-1"></i> 新しいお店を記録する</span>
-                <i class="fa-solid fa-chevron-down text-sm transition-transform"></i>
-            </summary>
-            <div class="px-5 pb-5 pt-2">
-                <form id="shopForm" class="space-y-4">
+        <div id="formContainer" class="hidden fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl overflow-y-auto max-h-[90vh]">
+                <div class="p-5 border-b flex justify-between items-center">
+                    <h2 id="formTitle" class="font-bold text-brand-600">お店を記録する</h2>
+                    <button onclick="toggleForm()" class="text-gray-400 text-xl">×</button>
+                </div>
+                <form id="shopForm" class="p-5 space-y-4 text-sm">
+                    <input type="hidden" id="editId">
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1 caps">店名 *</label>
-                        <input type="text" id="shopName" required placeholder="お店の名前" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none">
+                        <label class="block font-bold text-gray-500 mb-1">店名 *</label>
+                        <input type="text" id="shopName" required class="w-full px-3 py-2 border rounded-lg outline-none">
                     </div>
+                    
+                    <div>
+                        <label class="block font-bold text-gray-500 mb-1">営業曜日 (タップで選択)</label>
+                        <div class="flex justify-between gap-1">
+                            <input type="checkbox" id="d0" value="0" class="hidden"><label for="d0" class="flex-1 text-center py-2 border rounded-md text-xs">日</label>
+                            <input type="checkbox" id="d1" value="1" class="hidden"><label for="d1" class="flex-1 text-center py-2 border rounded-md text-xs">月</label>
+                            <input type="checkbox" id="d2" value="2" class="hidden"><label for="d2" class="flex-1 text-center py-2 border rounded-md text-xs">火</label>
+                            <input type="checkbox" id="d3" value="3" class="hidden"><label for="d3" class="flex-1 text-center py-2 border rounded-md text-xs">水</label>
+                            <input type="checkbox" id="d4" value="4" class="hidden"><label for="d4" class="flex-1 text-center py-2 border rounded-md text-xs">木</label>
+                            <input type="checkbox" id="d5" value="5" class="hidden"><label for="d5" class="flex-1 text-center py-2 border rounded-md text-xs">金</label>
+                            <input type="checkbox" id="d6" value="6" class="hidden"><label for="d6" class="flex-1 text-center py-2 border rounded-md text-xs">土</label>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1">ジャンル</label>
-                            <select id="shopGenre" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white">
-                                <option value="和食">和食</option><option value="洋食">洋食</option><option value="中華">中華</option>
-                                <option value="イタリアン">イタリアン</option><option value="フレンチ">フレンチ</option>
-                                <option value="カフェ">カフェ</option><option value="ラーメン">ラーメン</option>
-                                <option value="カレー">カレー</option><option value="焼肉">焼肉</option><option value="その他">その他</option>
+                            <label class="block font-bold text-gray-500 mb-1">開店時間</label>
+                            <input type="time" id="openTime" value="11:00" class="w-full px-3 py-2 border rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-gray-500 mb-1">閉店時間</label>
+                            <input type="time" id="closeTime" value="22:00" class="w-full px-3 py-2 border rounded-lg">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-gray-500 mb-1">住所 / URL</label>
+                        <input type="text" id="shopAddress" placeholder="住所" class="w-full px-3 py-2 border rounded-lg mb-2">
+                        <input type="url" id="shopUrl" placeholder="URL" class="w-full px-3 py-2 border rounded-lg">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-bold text-gray-500 mb-1">ジャンル</label>
+                            <select id="shopGenre" class="w-full px-3 py-2 border rounded-lg bg-white">
+                                <option>和食</option><option>洋食</option><option>中華</option><option>イタリアン</option>
+                                <option>ラーメン</option><option>カレー</option><option>カフェ</option><option>その他</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1">評価</label>
-                            <select id="shopRating" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white">
-                                <option value="5">★★★★★</option><option value="4">★★★★☆</option>
-                                <option value="3" selected>★★★☆☆</option><option value="2">★★☆☆☆</option>
-                                <option value="1">★☆☆☆☆</option>
+                            <label class="block font-bold text-gray-500 mb-1">評価</label>
+                            <select id="shopRating" class="w-full px-3 py-2 border rounded-lg bg-white text-yellow-500">
+                                <option value="5">★★★★★</option><option value="4">★★★★☆</option><option value="3" selected>★★★☆☆</option>
                             </select>
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1">住所</label>
-                        <input type="text" id="shopAddress" placeholder="東京都渋谷区..." class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1">URL</label>
-                        <input type="url" id="shopUrl" placeholder="https://tabelog.com/..." class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1">タグ (カンマ区切り)</label>
-                        <input type="text" id="shopTags" placeholder="ランチ, 接待, 隠れ家" class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 mb-1">メモ</label>
-                        <textarea id="shopMemo" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none"></textarea>
-                    </div>
-                    <button type="submit" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-lg shadow transition transform active:scale-95">
-                        保存する
-                    </button>
+                    <button type="submit" class="w-full bg-brand-500 text-white font-bold py-3 rounded-xl shadow-lg mt-2">保存する</button>
                 </form>
             </div>
-        </details>
+        </div>
 
         <div id="shopList" class="space-y-4"></div>
     </main>
 
     <script>
-        const STORAGE_KEY = 'myGourmetApp_v2';
+        const STORAGE_KEY = 'myGourmetApp_v4';
         const form = document.getElementById('shopForm');
-        const shopList = document.getElementById('shopList');
-        const searchInput = document.getElementById('searchInput');
+        let currentFilterNow = false;
 
-        document.addEventListener('DOMContentLoaded', renderList);
+        function getShops() { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+
+        function toggleForm(isEdit = false) {
+            document.getElementById('formContainer').classList.toggle('hidden');
+            if (!isEdit) {
+                form.reset();
+                document.getElementById('editId').value = '';
+                document.getElementById('formTitle').innerText = 'お店を記録する';
+            }
+        }
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            const tags = document.getElementById('shopTags').value.split(',').map(t => t.trim()).filter(t => t !== "");
-            const newShop = {
-                id: Date.now(),
+            const shops = getShops();
+            const editId = document.getElementById('editId').value;
+            const openDays = [];
+            for(let i=0; i<7; i++) { if(document.getElementById(`d${i}`).checked) openDays.push(i); }
+            
+            const shopData = {
+                id: editId ? Number(editId) : Date.now(),
                 name: document.getElementById('shopName').value,
                 genre: document.getElementById('shopGenre').value,
                 rating: document.getElementById('shopRating').value,
+                openDays: openDays,
+                openTime: document.getElementById('openTime').value,
+                closeTime: document.getElementById('closeTime').value,
                 address: document.getElementById('shopAddress').value,
                 url: document.getElementById('shopUrl').value,
-                tags: tags,
-                memo: document.getElementById('shopMemo').value,
                 date: new Date().toLocaleDateString('ja-JP')
             };
-            const shops = getShops();
-            shops.unshift(newShop);
+
+            if (editId) {
+                const index = shops.findIndex(s => s.id === shopData.id);
+                shops[index] = shopData;
+            } else {
+                shops.unshift(shopData);
+            }
+
             localStorage.setItem(STORAGE_KEY, JSON.stringify(shops));
-            form.reset();
-            document.getElementById('formDetails').removeAttribute('open');
+            toggleForm();
             renderList();
         });
 
-        function getShops() {
-            return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        function editShop(id) {
+            const shop = getShops().find(s => s.id === id);
+            document.getElementById('editId').value = shop.id;
+            document.getElementById('shopName').value = shop.name;
+            document.getElementById('shopGenre').value = shop.genre;
+            document.getElementById('shopRating').value = shop.rating;
+            document.getElementById('openTime').value = shop.openTime;
+            document.getElementById('closeTime').value = shop.closeTime;
+            document.getElementById('shopAddress').value = shop.address || '';
+            document.getElementById('shopUrl').value = shop.url || '';
+            for(let i=0; i<7; i++) { document.getElementById(`d${i}`).checked = shop.openDays.includes(i); }
+            document.getElementById('formTitle').innerText = '情報を修正する';
+            toggleForm(true);
         }
 
-        function deleteShop(id) {
-            if(!confirm('削除しますか？')) return;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(getShops().filter(s => s.id !== id)));
+        function isOpening(shop) {
+            const now = new Date();
+            const day = now.getDay();
+            const time = now.getHours() * 100 + now.getMinutes();
+            const open = Number(shop.openTime.replace(':', ''));
+            const close = Number(shop.closeTime.replace(':', ''));
+            
+            const isDayMatch = shop.openDays.includes(day);
+            const isTimeMatch = (time >= open && time <= close);
+            return isDayMatch && isTimeMatch;
+        }
+
+        function filterByNow() {
+            currentFilterNow = !currentFilterNow;
+            renderList();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            currentFilterNow = false;
             renderList();
         }
 
         function renderList() {
-            const query = searchInput.value.toLowerCase();
-            const shops = getShops().filter(s => 
-                s.name.toLowerCase().includes(query) || 
-                s.tags.some(t => t.toLowerCase().includes(query))
-            );
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            let shops = getShops();
+
+            if (query) {
+                shops = shops.filter(s => s.name.toLowerCase().includes(query));
+            }
+            if (currentFilterNow) {
+                shops = shops.filter(s => isOpening(s));
+            }
             
-            shopList.innerHTML = shops.length ? '' : '<p class="text-center text-gray-400 py-10">見つかりませんでした</p>';
+            const list = document.getElementById('shopList');
+            list.innerHTML = '';
 
             shops.forEach(shop => {
-                const stars = '★'.repeat(shop.rating) + '☆'.repeat(5 - shop.rating);
-                const tagHtml = shop.tags.map(t => `<span class="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded mr-1">#${t}</span>`).join('');
+                const isOpen = isOpening(shop);
+                const dayLabels = ["日","月","火","水","木","金","土"];
+                const dayHtml = dayLabels.map((d, i) => `<span class="${shop.openDays.includes(i) ? 'text-brand-600 font-bold' : 'text-gray-300'}">${d}</span>`).join(' ');
                 
-                const card = document.createElement('div');
-                card.className = 'bg-white rounded-xl shadow-sm p-4 border border-brand-100 animate-fade-in relative';
-                card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <span class="text-[10px] font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded">${shop.genre}</span>
-                        <button onclick="deleteShop(${shop.id})" class="text-gray-300 hover:text-red-500"><i class="fa-solid fa-trash-can"></i></button>
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-800 mt-1">${shop.name}</h3>
-                    <div class="text-yellow-400 text-xs mb-2">${stars} <span class="text-gray-400 ml-1">${shop.date}</span></div>
-                    
-                    <div class="space-y-1 mb-3">
-                        ${shop.address ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.address)}" target="_blank" class="block text-xs text-blue-500 flex items-center gap-1"><i class="fa-solid fa-location-dot text-gray-400"></i> ${shop.address}</a>` : ''}
-                        ${shop.url ? `<a href="${shop.url}" target="_blank" class="block text-xs text-blue-500 flex items-center gap-1 overflow-hidden text-ellipsis whitespace-nowrap"><i class="fa-solid fa-link text-gray-400"></i> ${shop.url}</a>` : ''}
-                    </div>
+                list.innerHTML += `
+                    <div class="bg-white rounded-2xl shadow-sm border border-brand-100 p-5 relative">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex gap-2">
+                                <span class="text-[10px] font-bold bg-brand-50 text-brand-600 px-2 py-0.5 rounded">${shop.genre}</span>
+                                <span class="text-[10px] font-bold ${isOpen ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'} px-2 py-0.5 rounded">
+                                    ${isOpen ? '● 営業中' : '○ 営業時間外'}
+                                </span>
+                            </div>
+                            <div class="flex gap-4">
+                                <button onclick="editShop(${shop.id})" class="text-gray-300"><i class="fa-solid fa-pen"></i></button>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold mb-1">${shop.name}</h3>
+                        <div class="text-yellow-400 text-sm mb-2">${'★'.repeat(shop.rating)}</div>
+                        
+                        <div class="text-[11px] text-slate-500 mb-1 flex gap-2"><span>${dayHtml}</span></div>
+                        <div class="text-sm text-slate-600 mb-4 font-mono font-bold">${shop.openTime} - ${shop.closeTime}</div>
 
-                    ${shop.memo ? `<p class="text-sm text-slate-600 bg-slate-50 p-2 rounded mb-2 whitespace-pre-wrap">${shop.memo}</p>` : ''}
-                    <div class="flex flex-wrap gap-1">${tagHtml}</div>
+                        <div class="grid grid-cols-2 gap-3">
+                            ${shop.address ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.address)}" target="_blank" class="bg-blue-50 text-blue-600 py-3 rounded-xl text-center text-xs font-bold"><i class="fa-solid fa-location-dot"></i> 地図</a>` : ''}
+                            ${shop.url ? `<a href="${shop.url}" target="_blank" class="bg-green-50 text-green-600 py-3 rounded-xl text-center text-xs font-bold"><i class="fa-solid fa-link"></i> サイト</a>` : ''}
+                        </div>
+                    </div>
                 `;
-                shopList.appendChild(card);
             });
         }
+        document.addEventListener('DOMContentLoaded', renderList);
     </script>
 </body>
 </html>
